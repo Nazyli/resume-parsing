@@ -6,6 +6,11 @@ import nltk
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('maxent_ne_chunker')
 # nltk.download('words')
+import re
+
+# constant
+PATH_DIR = 'input'
+PHONE_REG = re.compile(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]')
 
 
 def extract_text_from_pdf(pdf_path):
@@ -21,11 +26,20 @@ def extract_names(txt):
 
     return person_names
 
+def extract_phone_number(resume_text):
+    phone = re.findall(PHONE_REG, resume_text)
+    if phone:
+        number = ''.join(phone[0])
+        return number
+        # if resume_text.find(number) >= 0 and len(number) < 16:
+        #     return number
+    return None
 
-pathDir = 'input'
-onlyfiles = [os.path.join(pathDir, f) for f in os.listdir(
-    pathDir) if os.path.isfile(os.path.join(pathDir, f))]
+
+onlyfiles = [os.path.join(PATH_DIR, f) for f in os.listdir(PATH_DIR) if os.path.isfile(os.path.join(PATH_DIR, f))]
 for x in onlyfiles:
     dataCV = extract_text_from_pdf(x)
     names = extract_names(dataCV)
+    phone = extract_phone_number(dataCV)
     print(names)
+    print(phone)
