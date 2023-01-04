@@ -11,6 +11,8 @@ import re
 # constant
 PATH_DIR = 'input'
 PHONE_REG = re.compile(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]')
+EMAIL_REG = re.compile(r'[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+')
+
 
 
 def extract_text_from_pdf(pdf_path):
@@ -36,10 +38,16 @@ def extract_phone_number(resume_text):
     return None
 
 
+def extract_emails(resume_text):
+    return re.findall(EMAIL_REG, resume_text)
+ 
+
 onlyfiles = [os.path.join(PATH_DIR, f) for f in os.listdir(PATH_DIR) if os.path.isfile(os.path.join(PATH_DIR, f))]
 for x in onlyfiles:
     dataCV = extract_text_from_pdf(x)
     names = extract_names(dataCV)
     phone = extract_phone_number(dataCV)
+    emails = extract_emails(dataCV)
     print(names)
     print(phone)
+    print(emails)
