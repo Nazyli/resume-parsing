@@ -12,6 +12,16 @@ import re
 PATH_DIR = 'input'
 PHONE_REG = re.compile(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]')
 EMAIL_REG = re.compile(r'[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+')
+SKILLS_DB = [
+    'machine learning',
+    'data science',
+    'python',
+    'word',
+    'excel',
+    'english',
+    'programming',
+    'matlab'
+]
 
 
 
@@ -41,6 +51,30 @@ def extract_phone_number(resume_text):
 def extract_emails(resume_text):
     return re.findall(EMAIL_REG, resume_text)
  
+def extract_skills(input_text):
+    stop_words = set(nltk.corpus.stopwords.words('english'))
+    word_tokens = nltk.tokenize.word_tokenize(input_text)
+    # remove the stop words
+    filtered_tokens = [w for w in word_tokens if w not in stop_words]
+    # remove the punctuation
+    filtered_tokens = [w for w in word_tokens if w.isalpha()]
+    # generate bigrams and trigrams (such as artificial intelligence)
+    bigrams_trigrams = list(map(' '.join, nltk.everygrams(filtered_tokens, 2, 3)))
+    # create a set to keep the results in.
+    found_skills = set()
+    # search for each token in our skills database
+    for token in filtered_tokens:
+        if token.lower() in SKILLS_DB:
+            found_skills.add(token)
+    # search for each bigram and trigram in our skills database
+    for ngram in bigrams_trigrams:
+        if ngram.lower() in SKILLS_DB:
+            found_skills.add(ngram)
+ 
+    return found_skills
+
+
+
 
 onlyfiles = [os.path.join(PATH_DIR, f) for f in os.listdir(PATH_DIR) if os.path.isfile(os.path.join(PATH_DIR, f))]
 for x in onlyfiles:
@@ -48,6 +82,8 @@ for x in onlyfiles:
     names = extract_names(dataCV)
     phone = extract_phone_number(dataCV)
     emails = extract_emails(dataCV)
+    skills = extract_skills(dataCV)
     print(names)
     print(phone)
     print(emails)
+    print(skills)
