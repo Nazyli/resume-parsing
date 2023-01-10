@@ -22,8 +22,24 @@ SKILLS_DB = [
     'programming',
     'matlab'
 ]
-
-
+RESERVED_WORDS = [
+    'school',
+    'college',
+    'univers',
+    'academy',
+    'faculty',
+    'institute',
+    'faculdades',
+    'Schola',
+    'schule',
+    'lise',
+    'lyceum',
+    'lycee',
+    'polytechnic',
+    'kolej',
+    'ünivers',
+    'okul',
+]
 
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
@@ -74,6 +90,23 @@ def extract_skills(input_text):
     return found_skills
 
 
+def extract_education(input_text):
+    organizations = []
+    # first get all the organization names using nltk
+    for sent in nltk.sent_tokenize(input_text):
+        for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sent))):
+            if hasattr(chunk, 'label') and chunk.label() == 'ORGANIZATION':
+                organizations.append(' '.join(c[0] for c in chunk.leaves()))
+    # we search for each bigram and trigram for reserved words
+    # (college, university etc...)
+    education = set()
+    for org in organizations:
+        for word in RESERVED_WORDS:
+            if org.lower().find(word) >= 0:
+                education.add(org)
+ 
+    return education
+
 
 
 onlyfiles = [os.path.join(PATH_DIR, f) for f in os.listdir(PATH_DIR) if os.path.isfile(os.path.join(PATH_DIR, f))]
@@ -83,7 +116,9 @@ for x in onlyfiles:
     phone = extract_phone_number(dataCV)
     emails = extract_emails(dataCV)
     skills = extract_skills(dataCV)
+    education = extract_education(dataCV)
     print(names)
     print(phone)
     print(emails)
     print(skills)
+    print(education)
